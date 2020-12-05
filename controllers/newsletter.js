@@ -17,6 +17,10 @@ const logger = log4js.getLogger('newsletter.js controller');
 // email config
 const config=require('../config/config')
 
+// import Model
+const User = require('../models/User')
+const Logs = require('../models/Logs')
+
 
 // @controller   POST /api/customer/login
 // @desc    Login customer 
@@ -52,7 +56,7 @@ exports.login=  (req, res) => {
 
 exports.send_newsletter=  (req, res) => {
       
-    const fileRows = [];
+  const fileRows = [];
   const validateCsvData = require('../validation/upload_csv')
   // open uploaded file
   csv.parseFile(req.file.path)
@@ -83,37 +87,49 @@ exports.send_newsletter=  (req, res) => {
 
 
 exports.send_email=  (email, newsletter_name,newletter_content) => {
+    console.log(email,"here")
 
+    User.findOne({emai:email}).then(response=>{
 
-
-    let transporter = nodemailer.createTransport({
-        service: "Gmail",
-        auth: {
-          user: config.smtpMailid,
-          pass: config.smtpPassword
-        }
-      });
-
-      let mailOptions = {
-        from: 'alenjoseph333@gmail.com',
-        to: 'alenjoseph333@gmail.com',
-        subject:'subjec',
-        text: 'hi'
-      };
-
-      transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-          logger.error({ "Email sent": "Email failed to send" });
-          res.status(404).json({
-            success: false,
-            "Email sent": error
+        if(response){
+          name = response.firstname + response.lastname
+          let transporter = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+              user: config.smtpMailid,
+              pass: config.smtpPassword
+            }
           });
-        } else {
-          logger.info("Email sent: " + info.response);
-          res.status(200).json({
-            success: true,
-            "Email sent": info.response
+    
+          let mailOptions = {
+            from: 'noreply@demo.com',
+            to: email,
+            subject:newsletter_name,
+            text: `Hi ${name} \r\n ${newletter_content}`
+          };
+    
+          transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+              logger.error({ "Email sent": "Email failed to send" });
+              res.status(404).json({
+                success: false,
+                "Email sent": error
+              });
+            } else {
+              logger.info("Email sent: " + info.response);
+              res.status(200).json({
+                success: true,
+                "Email sent": info.response
+              });
+            }
           });
+
         }
-      });
+        else{
+            console.log('user not found')
+        }
+
+})
+
+
 }
