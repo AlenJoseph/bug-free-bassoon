@@ -23,7 +23,7 @@ const upload = multer({ dest: 'tmp/csv/' });
 // @Input   CSV with user details
 // @Output  Response message
 // @access  Public
-router.post('/send_newsletter',upload.single('file'), controller.send_newsletter);
+router.post('/send_newsletter',upload.single('file'), controller.send_newsletter_queue);
 
 
 

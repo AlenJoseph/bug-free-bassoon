@@ -22,9 +22,9 @@ module.exports = function validateLoginInput(data) {
     errors.age = 'Age field is required';
   }
 //   ,{allow_leading_zeroes: false}
-  if (Validator.isInt(data.age)) {
-    errors.age = 'Age field is not valid';
-  }
+  // if (Validator.isInt(data.age)) {
+  //   errors.age = 'Age field is not valid';
+  // }
   if (Validator.isEmpty(data.firstname)) {
     errors.firstname = 'Firstname field is required';
   }

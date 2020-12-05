@@ -9,7 +9,7 @@ const log4js = require('log4js');
 const nodemailer = require("nodemailer");
 const csv = require('fast-csv');
 const fs = require('fs');
-const publishToQueue=require('../services/rabbit_mq_producer').publishToQueue
+const publishToQueue=require('../rabbit_mq_services/rabbit_mq_producer').publishToQueue
 
 // logger config
 const logger = log4js.getLogger('newsletter.js controller');
@@ -28,33 +28,8 @@ const Logs = require('../models/Logs')
 // @Output  File
 // @access  Public
 
-exports.login=  (req, res) => {
 
-  /*
-      checking wether the request contains all the required fields.
-  */
-  if( !req.body.uname|| !req.body.password){
-      return res.status(400).send({
-          error : "Expected values missing"
-      })
-  }
-  else{
-      /*
-          consolidating the results to be send to the client
-      */
-
-      let result = {
-          customer : req.body.uname,
-          password: req.body.password,
-   
-      }
-      logger.info(result)
-      return res.send(result);
-
-  }
-}
-
-exports.send_newsletter=  (req, res) => {
+exports.send_newsletter_queue=  (req, res) => {
       
   const fileRows = [];
   const validateCsvData = require('../validation/upload_csv')
@@ -87,12 +62,13 @@ exports.send_newsletter=  (req, res) => {
 
 
 exports.send_email=  (email, newsletter_name,newletter_content) => {
-    console.log(email,"here")
 
-    User.findOne({emai:email}).then(response=>{
-
+    User.findOne({email:email})
+      .then(response=>{
+          console.log(response)
         if(response){
-          name = response.firstname + response.lastname
+
+          name = response.firstname + ' '+response.lastname
           let transporter = nodemailer.createTransport({
             service: "Gmail",
             auth: {
@@ -111,25 +87,80 @@ exports.send_email=  (email, newsletter_name,newletter_content) => {
           transporter.sendMail(mailOptions, function(error, info) {
             if (error) {
               logger.error({ "Email sent": "Email failed to send" });
-              res.status(404).json({
-                success: false,
-                "Email sent": error
-              });
+                          
+            Logs.findOne({ email: email })
+            .then(logs => {
+              if (logs) {
+                logger.error({ msg: "Email already exists" });
+              } else {
+                  date=new Date().toLocaleString()
+                const logs = new Logs({
+                  date:date,
+                  newsletter_name:newsletter_name,
+                  email: email,
+                }); 
+                  logs
+                  .save()
+                  .then(logs => {
+                      logger.info({ msg: "logs added successfully" });
+                      payload={'email':email,'newletter_name':newsletter_name,'newsletter_content':newletter_content}
+                      publishToQueue(config.parking_lot_queue,payload)
+                     
+                  })
+                  .catch(err => {
+            
+                      logger.error({ msg: "write to log failed" });
+                    
+                  });
+               
+              }
+            })
+            .catch(err => {
+              logger.error({ msg: "email queue failed" })
+            });
+              
             } else {
               logger.info("Email sent: " + info.response);
-              res.status(200).json({
-                success: true,
-                "Email sent": info.response
-              });
             }
           });
-
         }
         else{
-            console.log('user not found')
+            
+            Logs.findOne({ email: email })
+            .then(logs => {
+              if (logs) {
+                logger.error({ msg: "Email already exists" });
+              } else {
+                  date=new Date().toLocaleString()
+                const logs = new Logs({
+                  date:date,
+                  newsletter_name:newsletter_name,
+                  email: email,
+                }); 
+                  logs
+                  .save()
+                  .then(logs => {
+                      logger.info({ msg: "logs added successfully" });
+                      payload={'email':email,'newletter_name':newsletter_name,'newsletter_content':newletter_content}
+                      publishToQueue(config.parking_lot_queue,payload)
+                     
+                  })
+                  .catch(err => {
+            
+                      logger.error({ msg: "write to log failed" });
+                    
+                  });
+               
+              }
+            })
+            .catch(err => {
+              logger.error({ msg: "email queue failed" })
+            });
         }
 
-})
+}).catch(err => {
+    logger.error({ msg: "email queue failed" })
+  });
 
 
 }

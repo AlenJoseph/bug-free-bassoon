@@ -64,7 +64,7 @@ app.use(errorHandling.serverError);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     logger.info(`Server running on port ${PORT}`)
-    const eH = spawn('node', ['./services/rabbit_mq_consumer_worker']);
+    const eH = spawn('node', ['./rabbit_mq_services/rabbit_mq_consumer_worker']);
 
             eH.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);

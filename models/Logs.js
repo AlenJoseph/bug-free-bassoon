@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 //create logs schema
 const LogsSchema = new Schema({
   date: {
-    type: String,
-    required: true
+    type: Date,
+    // required: true
   },
   email: {
     type: String,
