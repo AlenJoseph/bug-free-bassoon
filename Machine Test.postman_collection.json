@@ -1,0 +1,84 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Machine Test",
+		"_postman_id": "4b300f70-86ef-3858-6f08-32e2915a55c7",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add User",
+			"request": {
+				"url": "http://localhost:3000/dev/user/add_user",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "age",
+							"value": "20",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "firstname",
+							"value": "Jon",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "lastname",
+							"value": "Snow",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "alenjoseph333@gmail.com",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Send News Letter",
+			"request": {
+				"url": "http://localhost:3000/dev/newsletter/send_newsletter",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"description": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"value": "",
+							"description": "",
+							"type": "file"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

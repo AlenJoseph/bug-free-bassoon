@@ -10,3 +10,6 @@
 1) create .env file and add the config in the .env.temp
 2) run npm install
 3) run npm start
+
+### Example
+ 1) You can use the test.csv as well as the postman collection for reffrence
