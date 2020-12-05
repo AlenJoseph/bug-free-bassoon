@@ -67,15 +67,15 @@ app.listen(PORT, () => {
     const eH = spawn('node', ['./rabbit_mq_services/rabbit_mq_consumer_worker']);
 
             eH.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`);
+            logger.info(`stdout: ${data}`);
             });
 
             eH.stderr.on('data', (data) => {
-            console.log(`stderr: ${data}`);
+            logger.info(`stderr: ${data}`);
             });
 
             eH.on('close', (code) => {
-            console.log(`eventsHandler process exited with code ${code}`);
+            logger.info(`eventsHandler process exited with code ${code}`);
             });
 
 });
